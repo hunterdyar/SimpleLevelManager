@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Bloops.Cutscene;
 using Bloops.StateMachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,7 +11,6 @@ namespace Bloops.LevelManager
 	{
 		[Tooltip("UI scene to be loaded. Needs to contain a CutsceneRunner asset.")]
 		public SceneField[] managerScenes;
-		public CutsceneReference activeCutscene;
 		private Level currentLevel => GameLevels.GetCurrentLevel();
 		[SerializeField]
 		[RequireInterface(typeof(ILevelCollection))]
@@ -105,16 +103,6 @@ namespace Bloops.LevelManager
 				
 				//update the current level (after unloading the previous current level).
 				GameLevels.SetCurrentLevel(level);
-				
-				//check if we need the cutscene scene
-				if (level.introCutscene != null)
-				{
-					activeCutscene.Set(level.introCutscene);
-				}
-				else
-				{
-					activeCutscene.Set(null);
-				}
 			}
 			else
 			{
@@ -125,7 +113,6 @@ namespace Bloops.LevelManager
 		public void SetCurrentScene(Scene scene)
 		{
 			GameLevels.SetCurrentLevel(GameLevels.GetLevelFromBuildIndex(scene.buildIndex));
-			activeCutscene.Set(currentLevel.introCutscene);
 		}
 	}
 }
