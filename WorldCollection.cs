@@ -24,11 +24,6 @@ namespace Bloops.LevelManager
 			currentWorld.PlayerCompletedCurrentLevel();
 		}
 
-		public void PlayerCompletedCurrentCutscene()
-		{
-			currentWorld.PlayerCompletedCurrentCutscene();
-		}
-
 		public Level GetCurrentLevel()
 		{
 			return currentWorld.GetCurrentLevel();

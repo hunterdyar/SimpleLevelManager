@@ -61,17 +61,13 @@ namespace Bloops.LevelManager
 			GameLevels.PlayerCompletedCurrentLevel();
 			GameLevels.SaveCompletionInfo();
 		}
-
-		public void PlayerCompletedCurrentCutscene()
-		{
-			GameLevels.PlayerCompletedCurrentCutscene();
-			GameLevels.SaveCompletionInfo();
-		}
+		[ContextMenu("Restart Current Level")]
 
 		public void RestartCurrentLevel()
 		{
 			LoadLevel(GameLevels.GetCurrentLevel());
 		}
+		[ContextMenu("Go To Next Level")]
 		public void GoToNextLevel()
 		{
 			//Have we marked the current level as completed?

@@ -61,11 +61,6 @@ namespace Bloops.LevelManager
 			_currentLevel.completedByPlayer = true;
 		}
 
-		public void PlayerCompletedCurrentCutscene()
-		{
-			_currentLevel.cutsceneWatchedByPlayer = true;
-		}
-
 		public Level GetCurrentLevel()
 		{
 			return _currentLevel;

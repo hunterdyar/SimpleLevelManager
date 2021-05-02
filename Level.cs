@@ -16,8 +16,6 @@ namespace Bloops.LevelManager
 	[Serializable]
 	public class Level
 	{
-		public TextAsset introCutscene;
-		public bool cutsceneWatchedByPlayer = false;
 		public string Levelname;
 		public SceneField scene;
 		public bool completedByPlayer = false;

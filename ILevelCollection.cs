@@ -15,6 +15,5 @@ namespace Bloops.LevelManager
 		void SaveCompletionInfo();
 		void LoadCompletionInfo();
 		void PlayerCompletedCurrentLevel();
-		void PlayerCompletedCurrentCutscene();
 	}
 }
