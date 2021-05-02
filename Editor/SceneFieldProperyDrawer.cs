@@ -33,8 +33,7 @@ using UnityEngine.SceneManagement;
                      if (sceneAsset.objectReferenceValue != null)
                      {
                          var scenePathA = AssetDatabase.GetAssetPath(sceneAsset.objectReferenceValue);
-                         var assetsIndex = scenePathA.IndexOf("Assets", StringComparison.Ordinal) + 7;
-                         var slashIndex = scenePathA.LastIndexOf("/", StringComparison.Ordinal) + 7;
+                         var slashIndex = scenePathA.LastIndexOf("/", StringComparison.Ordinal)+1;
                          var extensionIndex = scenePathA.LastIndexOf(".unity", StringComparison.Ordinal);
                          scenePath.stringValue = scenePathA;
                          sceneName.stringValue = scenePathA.Substring(slashIndex, extensionIndex - slashIndex);

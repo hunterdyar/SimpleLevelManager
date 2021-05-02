@@ -29,6 +29,12 @@ namespace Bloops.LevelManager
 			return currentWorld.GetCurrentLevel();
 		}
 
+		public Level GetFirstLevel()
+		{
+			_currentWorldIndex = 0;
+			return currentWorld.GetFirstLevel();
+		}
+
 		public Level GetLevelFromBuildIndex(int buildIndex)
 		{
 			throw new System.NotImplementedException();

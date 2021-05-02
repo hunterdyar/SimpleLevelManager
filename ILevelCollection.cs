@@ -7,6 +7,7 @@ namespace Bloops.LevelManager
 	{
 		Level GetNextLevel();
 		Level GetCurrentLevel();
+		Level GetFirstLevel();
 		Level GetLevelFromBuildIndex(int buildIndex);
 
 		void SetCurrentLevel(Level level);

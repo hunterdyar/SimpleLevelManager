@@ -51,7 +51,7 @@ namespace Bloops.LevelManager
 				}
 				else
 				{
-					Debug.LogError("cant set level to null",this);
+					// SetCurrentLevel(levels[0]);
 				}
 			}
 		}
@@ -64,6 +64,11 @@ namespace Bloops.LevelManager
 		public Level GetCurrentLevel()
 		{
 			return _currentLevel;
+		}
+
+		public Level GetFirstLevel()
+		{
+			return levels[0];
 		}
 
 		public void PlayerCompletedCurrentlyActiveScene()

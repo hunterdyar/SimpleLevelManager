@@ -15,6 +15,8 @@ namespace Bloops.LevelManager
 		[SerializeField]
 		[RequireInterface(typeof(ILevelCollection))]
 		private UnityEngine.Object _gameLevels;
+
+		private bool initiated = false;
 		public ILevelCollection GameLevels => _gameLevels as ILevelCollection;
 		
 		private void OnEnable()
@@ -28,6 +30,14 @@ namespace Bloops.LevelManager
 			SceneManager.activeSceneChanged -= ActiveSceneChanged;
 			SceneManager.sceneLoaded -= SceneLoaded;
 		}
+
+		// public void Initiate()
+		// {
+		// 	LoadManagers();
+		// 	initiated = true;
+		// 	var initialLevel = GameLevels.GetFirstLevel();
+		// 	LoadLevel(initialLevel);
+		// }
 
 		private void ActiveSceneChanged(Scene current, Scene next)
 		{
@@ -50,12 +60,13 @@ namespace Bloops.LevelManager
 		{
 			foreach (SceneField managerScene in managerScenes)
 			{
-				if (!SceneManager.GetSceneByBuildIndex(managerScene.BuildIndex).isLoaded)
+				if (!SceneManager.GetSceneByName(managerScene.SceneName).isLoaded)
 				{
-					SceneManager.LoadSceneAsync(managerScene.BuildIndex, LoadSceneMode.Additive);
+					SceneManager.LoadSceneAsync(managerScene.SceneName, LoadSceneMode.Additive);
 				}
 			}
 		}
+		
 		public void PlayerCompletedCurrentLevel()
 		{
 			GameLevels.PlayerCompletedCurrentLevel();
@@ -84,16 +95,20 @@ namespace Bloops.LevelManager
 
 		private void LoadLevel(Level level)
 		{
+			if (level == currentLevel)
+			{
+				Debug.Log("???");
+			}
 			if (level != null)
 			{
 				//load the scene
-				SceneManager.LoadScene(level.scene.BuildIndex,LoadSceneMode.Additive);
+				SceneManager.LoadScene(level.scene.SceneName,LoadSceneMode.Additive);
 				
 				//unload the previous sceme.
 				if (currentLevel != null)
 				{
-					if(SceneManager.GetSceneByBuildIndex(currentLevel.scene.BuildIndex).isLoaded){
-						SceneManager.UnloadSceneAsync(currentLevel.scene.BuildIndex);
+					if(SceneManager.GetSceneByName(currentLevel.scene.SceneName).isLoaded){
+						SceneManager.UnloadSceneAsync(currentLevel.scene.SceneName);
 					}
 				}
 				
