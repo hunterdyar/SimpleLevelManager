@@ -38,6 +38,11 @@ namespace Bloops.LevelManager
 			return null;
 		}
 
+		public bool ContainsLevel(Level level)
+		{
+			return levels.Contains(level);
+		}
+
 		public void SetCurrentLevel(Level level)
 		{
 			if (level != null && levels.Contains(level))
@@ -59,6 +64,18 @@ namespace Bloops.LevelManager
 		public void PlayerCompletedCurrentLevel()
 		{
 			_currentLevel.completedByPlayer = true;
+		}
+
+		public Level GetLevelFromName(string sceneName)
+		{
+			foreach(Level l in levels)
+			{
+				if (l.scene.SceneName == sceneName)
+				{
+					return l;
+				}
+			}
+			return null;
 		}
 
 		public Level GetCurrentLevel()

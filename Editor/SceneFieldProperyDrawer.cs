@@ -1,6 +1,5 @@
 ﻿using System;
  using UnityEngine;
- using Object = UnityEngine.Object;
  #if UNITY_EDITOR
  using UnityEditor;
 using UnityEngine.SceneManagement;
@@ -39,7 +38,6 @@ using UnityEngine.SceneManagement;
                          sceneName.stringValue = scenePathA.Substring(slashIndex, extensionIndex - slashIndex);
                          //
                          buildIndex.intValue = SceneUtility.GetBuildIndexByScenePath(scenePathA);
-
                      }
                  }
              }

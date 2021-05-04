@@ -1,19 +1,26 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Bloops.LevelManager;
+﻿using Bloops.LevelManager;
 using UnityEngine;
 
+/// <summary>
+/// This component goes into the scene that is the level.
+/// Doesnt go in manager scenes.
+/// </summary>
 public class SetCurrentLevelOnLoad : MonoBehaviour
 {
     public LevelsManager manager;
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private bool loadManagers = true;
+    void Awake()
     {
-        //This brute force method is basically just for testing, we can open any scene as if its been loaded - so long as its been set in our scene.
+        //We have loaded, thus we must be the current scene. 
+        manager.SetCurrentScene(gameObject.scene);
         
-        //todo: if unityEditor, or not. if not we _hopefully_ dont need this, but that code hasnt been written (at the time of typing)
-        // manager.SetCurrentFromActive();
+        //load managers checks if manager scenes are loaded already. Which is great for popping between scenes in the editor, but only needed on the first scene in the build.
+        //hypothetically...
+        if (loadManagers)
+        {
+	        manager.LoadManagers();
+        }
     }
 
- 
+    
 }

@@ -4,9 +4,9 @@ using UnityEngine;
 namespace Bloops.LevelManager
 {
 	[CreateAssetMenu(fileName = "World Collection", menuName = "Bloops/Level Manager/World Collection", order = 0)]
-	public class World : ScriptableObject, ILevelCollection
+	public class WorldCollection : ScriptableObject, ILevelCollection
 	{
-		public List<ILevelCollection> worlds;
+		public List<LevelCollection> worlds;
 		private int _currentWorldIndex = 0;
 		public int CurrentWorldIndex => _currentWorldIndex;
 		public ILevelCollection currentWorld => worlds[_currentWorldIndex];
@@ -24,6 +24,20 @@ namespace Bloops.LevelManager
 			currentWorld.PlayerCompletedCurrentLevel();
 		}
 
+		public Level GetLevelFromName(string sceneName)
+		{
+			foreach (var lc in worlds)
+			{
+				var l = lc.GetLevelFromName(sceneName);
+				if (l != null)
+				{
+					return l;
+				}
+			}
+
+			return null;
+		}
+
 		public Level GetCurrentLevel()
 		{
 			return currentWorld.GetCurrentLevel();
@@ -37,12 +51,42 @@ namespace Bloops.LevelManager
 
 		public Level GetLevelFromBuildIndex(int buildIndex)
 		{
-			throw new System.NotImplementedException();
+			foreach (var lc in worlds)
+			{
+				var l = lc.GetLevelFromBuildIndex(buildIndex);
+				if (l != null)
+				{
+					return l;
+				}
+			}
+
+			return null;
+		}
+
+		public bool ContainsLevel(Level level)
+		{
+			foreach(var lc in worlds)
+			{
+				if (lc.ContainsLevel(level))
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		public void SetCurrentLevel(Level level)
 		{
-			throw new System.NotImplementedException();
+			foreach(var lc in worlds)
+			{
+				if (lc.ContainsLevel(level))
+				{
+					lc.SetCurrentLevel(level);
+					_currentWorldIndex = worlds.IndexOf(lc);
+					return;
+				}
+			}
 		}
 
 		public void SaveCompletionInfo()

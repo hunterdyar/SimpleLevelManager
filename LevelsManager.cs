@@ -16,29 +16,21 @@ namespace Bloops.LevelManager
 		[RequireInterface(typeof(ILevelCollection))]
 		private UnityEngine.Object _gameLevels;
 
-		private bool initiated = false;
+		// private bool initiated = false;
 		public ILevelCollection GameLevels => _gameLevels as ILevelCollection;
 		
 		private void OnEnable()
 		{
-			SceneManager.activeSceneChanged += ActiveSceneChanged;
+			// SceneManager.activeSceneChanged += ActiveSceneChanged;
 			SceneManager.sceneLoaded += SceneLoaded;
 		}
 
 		private void OnDisable()
 		{
-			SceneManager.activeSceneChanged -= ActiveSceneChanged;
+			// SceneManager.activeSceneChanged -= ActiveSceneChanged;
 			SceneManager.sceneLoaded -= SceneLoaded;
 		}
-
-		// public void Initiate()
-		// {
-		// 	LoadManagers();
-		// 	initiated = true;
-		// 	var initialLevel = GameLevels.GetFirstLevel();
-		// 	LoadLevel(initialLevel);
-		// }
-
+		
 		private void ActiveSceneChanged(Scene current, Scene next)
 		{
 			//We should only do this here when entering the scene from the unity inspector.
@@ -95,14 +87,10 @@ namespace Bloops.LevelManager
 
 		private void LoadLevel(Level level)
 		{
-			if (level == currentLevel)
-			{
-				Debug.Log("???");
-			}
 			if (level != null)
 			{
 				//load the scene
-				SceneManager.LoadScene(level.scene.SceneName,LoadSceneMode.Additive);
+				SceneManager.LoadSceneAsync(level.scene.SceneName,LoadSceneMode.Additive);
 				
 				//unload the previous sceme.
 				if (currentLevel != null)
@@ -112,7 +100,11 @@ namespace Bloops.LevelManager
 					}
 				}
 				
-				//update the current level (after unloading the previous current level).
+		
+				//update the current level!
+				//This doesn't actually have to happen, the new level should set this when it loads.
+				//I want to find a way to get a nice simple error if the scene is missing the SetCurrentLevelOnLoad
+				//of course... todo: fix this.
 				GameLevels.SetCurrentLevel(level);
 			}
 			else
@@ -123,7 +115,11 @@ namespace Bloops.LevelManager
 
 		public void SetCurrentScene(Scene scene)
 		{
-			GameLevels.SetCurrentLevel(GameLevels.GetLevelFromBuildIndex(scene.buildIndex));
+			var newCurrentLevel = GameLevels.GetLevelFromName(scene.name);
+			if (newCurrentLevel != currentLevel)
+			{
+				GameLevels.SetCurrentLevel(newCurrentLevel);
+			}
 		}
 	}
 }
