@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Bloops.GridFramework.Utility;
 using Bloops.StateMachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -87,6 +88,11 @@ namespace Bloops.LevelManager
 
 		private void LoadLevel(Level level)
 		{
+			var restarting = false;
+			if (level == currentLevel)
+			{
+				restarting = true;
+			}
 			if (level != null)
 			{
 				//load the scene
@@ -99,8 +105,6 @@ namespace Bloops.LevelManager
 						SceneManager.UnloadSceneAsync(currentLevel.scene.SceneName);
 					}
 				}
-				
-		
 				//update the current level!
 				//This doesn't actually have to happen, the new level should set this when it loads.
 				//I want to find a way to get a nice simple error if the scene is missing the SetCurrentLevelOnLoad
@@ -111,8 +115,20 @@ namespace Bloops.LevelManager
 			{
 				Debug.LogError("cant load null level.");
 			}
+
+			OnLevelLoading(restarting);
 		}
 
+		protected virtual void OnLevelLoading(bool restarting)
+		{
+			if (!restarting)
+			{
+				//I could do a null check here, but I want the error.
+				//if you are like wtf, error? like delete this line. I dont feel (yet) like factoring my project-unique code into a child manager.
+				//but i will do that eventually.
+				GameObject.FindObjectOfType<CameraTransition>().OpenOnStart = true;
+			}
+		}
 		public void SetCurrentScene(Scene scene)
 		{
 			var newCurrentLevel = GameLevels.GetLevelFromName(scene.name);
