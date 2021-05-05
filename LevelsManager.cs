@@ -12,7 +12,7 @@ namespace Bloops.LevelManager
 	{
 		[Tooltip("UI scene to be loaded. Needs to contain a CutsceneRunner asset.")]
 		public SceneField[] managerScenes;
-		private Level currentLevel => GameLevels.GetCurrentLevel();
+		public Level CurrentLevel => GameLevels.GetCurrentLevel();
 		[SerializeField]
 		[RequireInterface(typeof(ILevelCollection))]
 		private UnityEngine.Object _gameLevels;
@@ -82,14 +82,14 @@ namespace Bloops.LevelManager
 			else
 			{
 				Debug.Log("At end of level collection. Game over?");
-				LoadLevel(currentLevel);
+				LoadLevel(CurrentLevel);
 			}
 		}
 
 		private void LoadLevel(Level level)
 		{
 			var restarting = false;
-			if (level == currentLevel)
+			if (level == CurrentLevel)
 			{
 				restarting = true;
 			}
@@ -99,10 +99,10 @@ namespace Bloops.LevelManager
 				SceneManager.LoadSceneAsync(level.scene.SceneName,LoadSceneMode.Additive);
 				
 				//unload the previous sceme.
-				if (currentLevel != null)
+				if (CurrentLevel != null)
 				{
-					if(SceneManager.GetSceneByName(currentLevel.scene.SceneName).isLoaded){
-						SceneManager.UnloadSceneAsync(currentLevel.scene.SceneName);
+					if(SceneManager.GetSceneByName(CurrentLevel.scene.SceneName).isLoaded){
+						SceneManager.UnloadSceneAsync(CurrentLevel.scene.SceneName);
 					}
 				}
 				//update the current level!
@@ -126,13 +126,13 @@ namespace Bloops.LevelManager
 				//I could do a null check here, but I want the error.
 				//if you are like wtf, error? like delete this line. I dont feel (yet) like factoring my project-unique code into a child manager.
 				//but i will do that eventually.
-				GameObject.FindObjectOfType<CameraTransition>().OpenOnStart = true;
+				GameObject.FindObjectOfType<Bloops.Utilities.CameraTransition>().OpenOnStart = true;
 			}
 		}
 		public void SetCurrentScene(Scene scene)
 		{
 			var newCurrentLevel = GameLevels.GetLevelFromName(scene.name);
-			if (newCurrentLevel != currentLevel)
+			if (newCurrentLevel != CurrentLevel)
 			{
 				GameLevels.SetCurrentLevel(newCurrentLevel);
 			}
