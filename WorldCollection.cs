@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Bloops.LevelManager
@@ -37,6 +38,19 @@ namespace Bloops.LevelManager
 
 			return null;
 		}
+
+		public Level[] GetLevels()
+		{
+			List<Level> levels = new List<Level>();
+
+			foreach (var lc in worlds)
+			{
+				levels = levels.Concat(lc.GetLevels()).ToList();
+			}
+			
+			return levels.ToArray();
+		}
+		
 
 		public Level GetCurrentLevel()
 		{
@@ -97,7 +111,6 @@ namespace Bloops.LevelManager
 				world.SaveCompletionInfo();
 			}
 		}
-
 		public void LoadCompletionInfo()
 		{
 			//load current world index.

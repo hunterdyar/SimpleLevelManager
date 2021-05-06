@@ -78,6 +78,11 @@ namespace Bloops.LevelManager
 			return null;
 		}
 
+		public Level[] GetLevels()
+		{
+			return levels.ToArray();
+		}
+
 		public Level GetCurrentLevel()
 		{
 			return _currentLevel;
@@ -123,7 +128,7 @@ namespace Bloops.LevelManager
 			{
 				l.completedByPlayer = PlayerPrefs.GetInt(Seed() + l.Levelname + "_complete", 0) == 1;
 			}
-			_currentLevel = GetLevelFromSceneName(PlayerPrefs.GetString(Seed() + "current"));
+			// _currentLevel = GetLevelFromSceneName(PlayerPrefs.GetString(Seed() + "current"));
 		}
 		
 		private string Seed()
@@ -178,5 +183,7 @@ namespace Bloops.LevelManager
 
 			return null;
 		}
+
+		
 	}
 }

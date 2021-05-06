@@ -16,6 +16,7 @@ namespace Bloops.LevelManager
 	[Serializable]
 	public class Level
 	{
+		public int levelNumber;
 		public string Levelname;
 		public SceneField scene;
 		public bool completedByPlayer = false;

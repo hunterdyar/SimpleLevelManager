@@ -18,5 +18,7 @@ namespace Bloops.LevelManager
 		void LoadCompletionInfo();
 		void PlayerCompletedCurrentLevel();
 		Level GetLevelFromName(string sceneName);
+
+		Level[] GetLevels();
 	}
 }

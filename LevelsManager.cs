@@ -12,11 +12,23 @@ namespace Bloops.LevelManager
 	{
 		[Tooltip("UI scene to be loaded. Needs to contain a CutsceneRunner asset.")]
 		public SceneField[] managerScenes;
-		public Level CurrentLevel => GameLevels.GetCurrentLevel();
+		public Level CurrentLevel => GetCurrentLevel();
+
+		private Level GetCurrentLevel()
+		{
+			var l = GameLevels.GetCurrentLevel();
+			if (l == null)
+			{
+				Debug.Log("current level is null");
+			}
+
+			return l;
+		}
+
 		[SerializeField]
 		[RequireInterface(typeof(ILevelCollection))]
 		private UnityEngine.Object _gameLevels;
-
+		
 		// private bool initiated = false;
 		public ILevelCollection GameLevels => _gameLevels as ILevelCollection;
 		
@@ -85,6 +97,15 @@ namespace Bloops.LevelManager
 				LoadLevel(CurrentLevel);
 			}
 		}
+		
+		public void GoToLevel(Level level)
+		{
+			if (CurrentLevel == null)
+			{
+				Debug.LogWarning("Current Level is null!");
+			}
+			LoadLevel(level);
+		}
 
 		private void LoadLevel(Level level)
 		{
@@ -136,6 +157,20 @@ namespace Bloops.LevelManager
 			{
 				GameLevels.SetCurrentLevel(newCurrentLevel);
 			}
+		}
+
+		public void CalculateLevelNumbers()
+		{
+			var allLevels = GameLevels.GetLevels();
+			for (int i = 0; i < allLevels.Length; i++)
+			{
+				allLevels[i].levelNumber = i + 1;
+			}
+            		
+		}
+		public void LoadCompletionInfo()
+		{
+			GameLevels.LoadCompletionInfo();
 		}
 	}
 }
