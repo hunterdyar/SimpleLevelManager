@@ -41,6 +41,7 @@ namespace Bloops.LevelManager
 
 		public void SetToBeginning()
 		{
+			_currentWorldIndex = 0;
 			foreach (var lc in worlds)
 			{
 				lc.SetToBeginning();

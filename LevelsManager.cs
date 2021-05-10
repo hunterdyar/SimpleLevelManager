@@ -15,7 +15,11 @@ namespace Bloops.LevelManager
 		[SerializeField]
 		[RequireInterface(typeof(ILevelCollection))]
 		private UnityEngine.Object _gameLevels;
-		
+
+		/// <summary>
+		/// True when the level is being loaded for the first time, false when its restarting.
+		/// </summary>
+		public static bool FreshLevel = true;
 		// private bool initiated = false;
 		public static ILevelCollection GameLevels;
 
@@ -45,7 +49,7 @@ namespace Bloops.LevelManager
 				LoadCompletionInfo();
 				GameLevels.SetToBeginning();
 				CalculateLevelNumbers();
-				GoToNextLevel();
+				LoadLevel(GameLevels.GetCurrentLevel());
 			}
 		}
 
@@ -108,15 +112,15 @@ namespace Bloops.LevelManager
 
 		private static void LoadLevel(Level level)
 		{
-			var restarting = false;
+			FreshLevel = true;
 			if (level == CurrentLevel)
 			{
-				restarting = true;
+				FreshLevel = false;
 				
 				//my custom data here.
 				level.restarts++;
 			}
-
+			
 			//reset timer
 			level.timeOnPlay = 0;
 			
@@ -143,21 +147,13 @@ namespace Bloops.LevelManager
 				Debug.LogError("cant load null level.");
 			}
 
-			OnLevelLoading(restarting);
+			OnLevelLoading(FreshLevel);
 		}
 
-		protected static void OnLevelLoading(bool restarting)
+		protected static void OnLevelLoading(bool fresh)
 		{
-			if (!restarting)
+			if (fresh)
 			{
-				//I could do a null check here, but I want the error.
-				//if you are like wtf, error? like delete this line. I dont feel (yet) like factoring my project-unique code into a child manager.
-				//but i will do that eventually.
-				var ct = GameObject.FindObjectOfType<Bloops.Utilities.CameraTransition>();
-				if (ct != null)
-				{
-					ct.OpenOnStart = true;
-				}
 				OnNewLevel?.Invoke(CurrentLevel);
 			}
 			else
