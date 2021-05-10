@@ -1,5 +1,6 @@
 ﻿using Bloops.LevelManager;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// This component goes into the scene that is the level.
@@ -7,20 +8,18 @@ using UnityEngine;
 /// </summary>
 public class SetCurrentLevelOnLoad : MonoBehaviour
 {
-    public LevelsManager manager;
-    [SerializeField] private bool loadManagers = true;
+    [Tooltip("A scene that contains the LevelsManager singleton.")]
+    [SerializeField] private string LoaderLevelName;
     void Awake()
     {
-        //We have loaded, thus we must be the current scene. 
-        manager.SetCurrentScene(gameObject.scene);
-        
-        //load managers checks if manager scenes are loaded already. Which is great for popping between scenes in the editor, but only needed on the first scene in the build.
-        //hypothetically...
-        if (loadManagers)
+        if (!SceneManager.GetSceneByName(LoaderLevelName).isLoaded)
         {
-	        manager.LoadManagers();
+            SceneManager.LoadScene(LoaderLevelName,LoadSceneMode.Additive);
         }
     }
 
-    
+    void Start()
+    {
+        LevelsManager.SetCurrentScene(gameObject.scene);
+    }
 }

@@ -1,20 +1,55 @@
 ﻿using System;
-using System.Collections.Generic;
-using Bloops.GridFramework.Utility;
-using Bloops.StateMachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Bloops.LevelManager
 {
-	[CreateAssetMenu(fileName = "Levels Manager", menuName = "Bloops/Level Manager/Levels Manager", order = 0)]
-	public class LevelsManager : ScriptableObject
+	public class LevelsManager : MonoBehaviour
 	{
-		[Tooltip("UI scene to be loaded. Needs to contain a CutsceneRunner asset.")]
+		public static LevelsManager Instance;
+		[Tooltip("Other singleton (UI, etc) scenes to be loaded.")]
 		public SceneField[] managerScenes;
-		public Level CurrentLevel => GetCurrentLevel();
+		public static Level CurrentLevel => GetCurrentLevel();
+		public static Action<Level> OnRestart;
+		public static Action<Level> OnNewLevel;
+		[SerializeField]
+		[RequireInterface(typeof(ILevelCollection))]
+		private UnityEngine.Object _gameLevels;
+		
+		// private bool initiated = false;
+		public static ILevelCollection GameLevels;
 
-		private Level GetCurrentLevel()
+		private void Awake()
+		{
+			//lazy static singleton pattern
+			//im not actually sure we need this lol.
+			if (Instance != null)
+			{
+				Destroy(this.gameObject);
+			}
+			else
+			{
+				Instance = this;
+				GameLevels = _gameLevels as ILevelCollection;
+			}
+		}
+
+		void Start()
+		{
+			//if we have not already begun
+			//load the managers.
+			LoadManagers();
+			if (GameObject.FindObjectOfType<SetCurrentLevelOnLoad>() == null)
+			{
+				//starting the game fresh.
+				LoadCompletionInfo();
+				GameLevels.SetToBeginning();
+				CalculateLevelNumbers();
+				GoToNextLevel();
+			}
+		}
+
+		private static Level GetCurrentLevel()
 		{
 			var l = GameLevels.GetCurrentLevel();
 			if (l == null)
@@ -23,42 +58,6 @@ namespace Bloops.LevelManager
 			}
 
 			return l;
-		}
-
-		[SerializeField]
-		[RequireInterface(typeof(ILevelCollection))]
-		private UnityEngine.Object _gameLevels;
-		
-		// private bool initiated = false;
-		public ILevelCollection GameLevels => _gameLevels as ILevelCollection;
-		
-		private void OnEnable()
-		{
-			// SceneManager.activeSceneChanged += ActiveSceneChanged;
-			SceneManager.sceneLoaded += SceneLoaded;
-		}
-
-		private void OnDisable()
-		{
-			// SceneManager.activeSceneChanged -= ActiveSceneChanged;
-			SceneManager.sceneLoaded -= SceneLoaded;
-		}
-		
-		private void ActiveSceneChanged(Scene current, Scene next)
-		{
-			//We should only do this here when entering the scene from the unity inspector.
-			//That happens when current is null. But the object isnt null its just an empty placeholder, so we will check if one its properties is null.
-			if (current.path == null)
-			{
-				SetCurrentScene(next);
-			}
-			LoadManagers();
-		}
-		
-
-		private void SceneLoaded(Scene loadedScene, LoadSceneMode mode)
-		{
-			// LoadManagers();
 		}
 
 		public void LoadManagers()
@@ -72,19 +71,19 @@ namespace Bloops.LevelManager
 			}
 		}
 		
-		public void PlayerCompletedCurrentLevel()
+		public static void PlayerCompletedCurrentLevel()
 		{
 			GameLevels.PlayerCompletedCurrentLevel();
 			GameLevels.SaveCompletionInfo();
 		}
 		[ContextMenu("Restart Current Level")]
 
-		public void RestartCurrentLevel()
+		public static void RestartCurrentLevel()
 		{
 			LoadLevel(GameLevels.GetCurrentLevel());
 		}
 		[ContextMenu("Go To Next Level")]
-		public void GoToNextLevel()
+		public static void GoToNextLevel()
 		{
 			//Have we marked the current level as completed?
 			if (GameLevels.GetNextLevel() != null)
@@ -98,7 +97,7 @@ namespace Bloops.LevelManager
 			}
 		}
 		
-		public void GoToLevel(Level level)
+		public static void GoToLevel(Level level)
 		{
 			if (CurrentLevel == null)
 			{
@@ -107,13 +106,20 @@ namespace Bloops.LevelManager
 			LoadLevel(level);
 		}
 
-		private void LoadLevel(Level level)
+		private static void LoadLevel(Level level)
 		{
 			var restarting = false;
 			if (level == CurrentLevel)
 			{
 				restarting = true;
+				
+				//my custom data here.
+				level.restarts++;
 			}
+
+			//reset timer
+			level.timeOnPlay = 0;
+			
 			if (level != null)
 			{
 				//load the scene
@@ -140,17 +146,27 @@ namespace Bloops.LevelManager
 			OnLevelLoading(restarting);
 		}
 
-		protected virtual void OnLevelLoading(bool restarting)
+		protected static void OnLevelLoading(bool restarting)
 		{
 			if (!restarting)
 			{
 				//I could do a null check here, but I want the error.
 				//if you are like wtf, error? like delete this line. I dont feel (yet) like factoring my project-unique code into a child manager.
 				//but i will do that eventually.
-				GameObject.FindObjectOfType<Bloops.Utilities.CameraTransition>().OpenOnStart = true;
+				var ct = GameObject.FindObjectOfType<Bloops.Utilities.CameraTransition>();
+				if (ct != null)
+				{
+					ct.OpenOnStart = true;
+				}
+				OnNewLevel?.Invoke(CurrentLevel);
 			}
+			else
+			{
+				OnRestart?.Invoke(CurrentLevel);
+			}
+			
 		}
-		public void SetCurrentScene(Scene scene)
+		public static void SetCurrentScene(Scene scene)
 		{
 			var newCurrentLevel = GameLevels.GetLevelFromName(scene.name);
 			if (newCurrentLevel != CurrentLevel)
@@ -159,7 +175,7 @@ namespace Bloops.LevelManager
 			}
 		}
 
-		public void CalculateLevelNumbers()
+		public static void CalculateLevelNumbers()
 		{
 			var allLevels = GameLevels.GetLevels();
 			for (int i = 0; i < allLevels.Length; i++)
@@ -168,7 +184,7 @@ namespace Bloops.LevelManager
 			}
             		
 		}
-		public void LoadCompletionInfo()
+		public static void LoadCompletionInfo()
 		{
 			GameLevels.LoadCompletionInfo();
 		}

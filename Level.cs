@@ -19,6 +19,21 @@ namespace Bloops.LevelManager
 		public int levelNumber;
 		public string Levelname;
 		public SceneField scene;
+		
+		//player info
 		public bool completedByPlayer = false;
+		
+		//custom other info.
+		public int restarts = 0;
+		public float timeOnPlay = 0;
+		public float totalTimeOnLevel = 0;
+
+		public void ResetInfo()
+		{
+			completedByPlayer = false;
+			restarts = 0;
+			timeOnPlay = 0;
+			totalTimeOnLevel = 0;
+		}
 	}
 }

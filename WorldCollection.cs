@@ -39,6 +39,14 @@ namespace Bloops.LevelManager
 			return null;
 		}
 
+		public void SetToBeginning()
+		{
+			foreach (var lc in worlds)
+			{
+				lc.SetToBeginning();
+			}
+		}
+
 		public Level[] GetLevels()
 		{
 			List<Level> levels = new List<Level>();

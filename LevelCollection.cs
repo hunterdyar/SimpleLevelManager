@@ -26,6 +26,10 @@ namespace Bloops.LevelManager
 			return true;
 		}
 
+		public void SetToBeginning()
+		{
+			_currentLevel = levels[0];
+		}
 		public Level GetNextIncompleteLevel()
 		{
 			foreach (Level l in levels)
@@ -106,7 +110,7 @@ namespace Bloops.LevelManager
 		{
 			foreach (Level l in levels)
 			{
-				l.completedByPlayer = false;
+				l.ResetInfo();
 			}
 
 			_currentLevel = levels[0];
