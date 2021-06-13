@@ -20,6 +20,13 @@ namespace Bloops.LevelManager
 			//go to next world, and start that up.
 		}
 
+		public Level GetPreviousLevel()
+		{
+			return currentWorld.GetPreviousLevel();
+			//if not, 
+			//go to next world, and start that up.
+		}
+
 		public void PlayerCompletedCurrentLevel()
 		{
 			currentWorld.PlayerCompletedCurrentLevel();

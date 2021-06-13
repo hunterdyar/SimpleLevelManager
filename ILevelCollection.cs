@@ -21,5 +21,6 @@ namespace Bloops.LevelManager
 		void SetToBeginning();
 
 		Level[] GetLevels();
+		Level GetPreviousLevel();
 	}
 }

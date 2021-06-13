@@ -87,6 +87,19 @@ namespace Bloops.LevelManager
 			return levels.ToArray();
 		}
 
+		public Level GetPreviousLevel()
+		{
+			//ie: index++
+			if (_currentLevelIndex > 0)
+			{
+				return levels[_currentLevelIndex - 1];
+			}
+			else
+			{
+				return null;
+			}
+		}
+
 		public Level GetCurrentLevel()
 		{
 			return _currentLevel;
