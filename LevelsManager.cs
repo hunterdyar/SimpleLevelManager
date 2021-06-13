@@ -81,7 +81,7 @@ namespace Bloops.LevelManager
 			GameLevels.SaveCompletionInfo();
 		}
 		[ContextMenu("Restart Current Level")]
-
+ 
 		public static void RestartCurrentLevel()
 		{
 			LoadLevel(GameLevels.GetCurrentLevel());
