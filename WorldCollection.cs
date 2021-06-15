@@ -11,13 +11,32 @@ namespace Bloops.LevelManager
 		private int _currentWorldIndex = 0;
 		public int CurrentWorldIndex => _currentWorldIndex;
 		public ILevelCollection currentWorld => worlds[_currentWorldIndex];
-
 		public Level GetNextLevel()
 		{
+			//Calling this function twice in a row will NOT break level collections, they wait for PlayerCompletedCurrentLevel.
+			//WorldsCollection should behave the same way. 
+			//it doesnt right now. THis is a bug.
+			
 			//if current world has a next level....
-			return currentWorld.GetNextLevel();
-			//if not, 
+			var level = currentWorld.GetNextLevel();
+			if (level != null)
+			{
+				return level;
+			}
+			else //if not,
+			{
 			//go to next world, and start that up.
+				if (_currentWorldIndex < worlds.Count)
+				{
+					//recursive. simple enough.
+					_currentWorldIndex++;
+					return currentWorld.GetNextLevel();//will still be null on final level, this is fine.
+				}
+				else
+				{
+					return null;
+				}
+			}
 		}
 
 		public Level GetPreviousLevel()
@@ -121,6 +140,9 @@ namespace Bloops.LevelManager
 
 		public void SaveCompletionInfo()
 		{
+			string salt = LevelCollection.SaveSalt + "_";
+			PlayerPrefs.SetInt(salt + "currentWorld", _currentWorldIndex);
+			
 			//save current world index.
 			foreach (var world in worlds)
 			{
@@ -129,6 +151,8 @@ namespace Bloops.LevelManager
 		}
 		public void LoadCompletionInfo()
 		{
+			string salt = LevelCollection.SaveSalt + "_";
+			_currentWorldIndex = PlayerPrefs.GetInt(salt + "currentWorld", 0);
 			//load current world index.
 			foreach (var world in worlds)
 			{

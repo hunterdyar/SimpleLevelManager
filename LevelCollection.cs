@@ -11,7 +11,7 @@ namespace Bloops.LevelManager
 		//If you are on 2019 or before, use this... https://github.com/cfoulston/Unity-Reorderable-List
 		
 		public List<Level> levels;
-		private const string _saveSalt = "bloops_";//for versioning i guess. Hope its not needed
+		public static readonly string SaveSalt = "bloops_";//for versioning i guess. Hope its not needed
 		private Level _currentLevel;
 		private int _currentLevelIndex => levels.IndexOf(_currentLevel);
 		public bool AllLevelsCompletedByPlayer()
@@ -151,7 +151,7 @@ namespace Bloops.LevelManager
 		private string Seed()
 		{
 			//Save slots would be injected here.
-			return _saveSalt+name+"_";//save unique per level collection
+			return SaveSalt+name+"_";//save unique per level collection
 		}
 
 		public Level GetNextLevel()

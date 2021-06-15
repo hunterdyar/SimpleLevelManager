@@ -11,6 +11,7 @@ namespace Bloops.LevelManager
 		[Tooltip("Other singleton (UI, etc) scenes to be loaded.")]
 		public SceneField[] managerScenes;
 		public static Level CurrentLevel => GetCurrentLevel();
+		public static Level CurrentlyLoadedLevel;
 		public static Action<Level> OnRestart;
 		public static Action<Level> OnNewLevel;
 		[SerializeField]
@@ -93,9 +94,12 @@ namespace Bloops.LevelManager
 		public static void GoToNextLevel()
 		{
 			//Have we marked the current level as completed?
-			if (GameLevels.GetNextLevel() != null)
+			
+			//note we only call GetNextLevel once because of possible bugs when calling it multiple times for the world collection. this is a bug.
+			var level = GameLevels.GetNextLevel();
+			if (level != null)
 			{
-				LoadLevel(GameLevels.GetNextLevel());
+				LoadLevel(level);
 			}
 			else
 			{
@@ -129,16 +133,25 @@ namespace Bloops.LevelManager
 
 		private static void LoadLevel(Level level)
 		{
+			if (level == null)
+			{
+				Debug.LogWarning("Can't load null level.");
+				return;
+			}
+
 			//todo hacky fix to prevent two back-to-back calls.
 			if (!_isCurrentlyLoadingALevel)
 			{
 				Instance.StartCoroutine(DoLoadLevel(level));
 			}
+			else
+			{
+				Debug.Log("Asked to load level while level is loading.");
+			}
 		}
 		
 		private static IEnumerator DoLoadLevel(Level level)
 		{
-			//todo: put in coroutine and wait for level to load
 			_isCurrentlyLoadingALevel = true;
 			FreshLevel = true;
 			if (level == CurrentLevel)
@@ -151,42 +164,35 @@ namespace Bloops.LevelManager
 
 			//reset timer
 			level.timeOnPlay = 0;
-
-			if (level != null)
+			
+			//unload the previous sceme.
+			if (CurrentlyLoadedLevel != null)
 			{
-				//unload the previous sceme.
-				if (CurrentLevel != null)
+				if (SceneManager.GetSceneByName(CurrentlyLoadedLevel.scene.SceneName).isLoaded)
 				{
-					if (SceneManager.GetSceneByName(CurrentLevel.scene.SceneName).isLoaded)
+					AsyncOperation async = SceneManager.UnloadSceneAsync(CurrentlyLoadedLevel.scene.SceneName);
+					while (!async.isDone)
 					{
-						AsyncOperation async = SceneManager.UnloadSceneAsync(CurrentLevel.scene.SceneName);
-
-						while (!async.isDone)
-						{
-							yield return null;
-						}
+						yield return null;
 					}
 				}
-				
-				
-				//load the scene
-				AsyncOperation loadSceneAsync = SceneManager.LoadSceneAsync(level.scene.SceneName, LoadSceneMode.Additive);
-
-				while (!loadSceneAsync.isDone)
-				{
-					yield return null;
-				}
-
-				//update the current level!
-				//This doesn't actually have to happen, the new level should set this when it loads.
-				//I want to find a way to get a nice simple error if the scene is missing the SetCurrentLevelOnLoad
-				//of course... todo: fix this.
-				GameLevels.SetCurrentLevel(level);
 			}
-			else
+			
+			
+			//load the scene
+			AsyncOperation loadSceneAsync = SceneManager.LoadSceneAsync(level.scene.SceneName, LoadSceneMode.Additive);
+
+			while (!loadSceneAsync.isDone)
 			{
-				Debug.LogError("cant load null level.");
+				yield return null;
 			}
+
+			//update the current level!
+			//This doesn't actually have to happen, the new level should set this when it loads.
+			//I want to find a way to get a nice simple error if the scene is missing the SetCurrentLevelOnLoad
+			//of course... todo: fix this.
+			GameLevels.SetCurrentLevel(level);
+			CurrentlyLoadedLevel = level;
 
 			OnLevelLoading(FreshLevel);
 			
@@ -211,6 +217,7 @@ namespace Bloops.LevelManager
 			if (newCurrentLevel != CurrentLevel)
 			{
 				GameLevels.SetCurrentLevel(newCurrentLevel);
+				CurrentlyLoadedLevel = newCurrentLevel;
 			}
 		}
 
